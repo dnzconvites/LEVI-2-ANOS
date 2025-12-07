@@ -1,223 +1,193 @@
+
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Moldura Interativa - Dnz Convites</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>LEVI 2 ANOS</title>
 
-<style>
-  * { margin: 0; padding: 0; box-sizing: border-box; }
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html, body {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background: #000;
+      font-family: sans-serif;
+    }
 
-  body, html {
-    width: 100%;
-    height: 100%;
-    background: #1e406f;
-    font-family: "Poppins", sans-serif;
-    overflow: hidden;
-  }
+    #video, #overlay {
+      position: absolute;
+      width: 100vw;
+      height: 100vh;
+      object-fit: cover;
+    }
 
-  /* Vídeo + Moldura */
-  #video, #overlay {
-    position: absolute;
-    width: 100vw;
-    height: 100vh;
-    object-fit: cover;
-    top: 0;
-    left: 0;
-  }
+    #overlay { pointer-events: none; }
 
-  /* FILTRO AO VIVO NO VÍDEO */
-  #video {
-    filter: brightness(1.08) contrast(1.1) saturate(1.15);
-  }
+    #buttons {
+      position: absolute;
+      bottom: 50px;
+      width: 100%;
+      display: flex;
+      justify-content: center;
+      gap: 40px;
+      z-index: 10;
+    }
 
-  #overlay {
-    pointer-events: none;
-  }
+    button {
+      width: 70px;
+      height: 70px;
+      border-radius: 50%;
+      border: none;
+      background: white;
+      font-size: 28px;
+      cursor: pointer;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+    }
 
-  /* Botões principais */
-  #buttons {
-    position: absolute;
-    bottom: 40px;
-    width: 100%;
-    display: flex;
-    justify-content: center;
-    gap: 30px;
-    z-index: 20;
-  }
+    #preview-container {
+      position: absolute;
+      bottom: 40px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 11;
+      display: none;
+      flex-direction: column;
+      align-items: center;
+    }
 
-  button {
-    width: 70px;
-    height: 70px;
-    border-radius: 50%; 
-    border: none;
-    background: linear-gradient(135deg, #f8e9da, #f3d4bb);
-    font-size: 26px;
-    color: #1e406f;
-    cursor: pointer;
-    box-shadow: 0 6px 18px rgba(0,0,0,0.15);
-    transition: 0.2s;
-  }
+    #photo-preview {
+      width: 85vw;
+      max-width: 280px;
+      border: 3px solid white;
+      border-radius: 10px;
+      margin-bottom: 8px;
+    }
 
-  button:active {
-    transform: scale(0.95);
-  }
+    #save-btn, #retry-btn {
+      background: #002e60;
+      color: white;
+      border-radius: 6px;
+      padding: 8px 16px;
+      font-size: 15px;
+      margin-top: 5px;
+      width: 160px;
+    }
 
-  /* Preview */
-  #preview-container {
-    position: absolute;
-    bottom: 50px;
-    left: 50%;
-    transform: translateX(-50%);
-    z-index: 25;
-    background: rgba(255,255,255,0.9);
-    padding: 15px;
-    border-radius: 15px;
-    display: none;
-    flex-direction: column;
-    align-items: center;
-    width: 300px;
-  }
-
-  #photo-preview {
-    width: 100%;
-    border-radius: 12px;
-    border: 3px solid #e4cec0;
-    margin-bottom: 10px;
-  }
-
-  /* BOTÕES REDONDOS NA PREVIEW */
-  #save-btn, #retry-btn {
-    width: 80px;
-    height: 80px;
-    border-radius: 50%;
-    border: none;
-    background: #1e406f;
-    color: #fff;
-    font-size: 26px;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin: 10px auto;
-  }
-
-  #retry-btn {
-    background: #1e406f;
-  }
-
-  #instructions {
-    margin-top: 10px;
-    background: rgba(0,0,0,0.5);
-    padding: 8px;
-    color: #fff;
-    border-radius: 8px;
-    display: none;
-    font-size: 13px;
-    text-align: center;
-  }
-</style>
+    #instructions {
+      color: #fff;
+      font-size: 14px;
+      font-weight: bold;
+      background-color: rgba(0,0,0,0.6);
+      padding: 10px 12px;
+      border-radius: 8px;
+      margin-top: 10px;
+      display: none;
+      text-align: center;
+      max-width: 90%;
+    }
+  </style>
 </head>
 
 <body>
+  <video id="video" autoplay muted playsinline></video>
+  <img id="overlay" src="moldura.png" />
 
-<video id="video" autoplay playsinline muted></video>
-<img id="overlay" src="moldura.png" alt="Moldura"/>
-
-<div id="buttons">
-  <button id="switch-camera">🔄</button>
-  <button id="capture">📸</button>
-</div>
-
-<canvas id="canvas" style="display:none;"></canvas>
-
-<div id="preview-container">
-  <img id="photo-preview">
-  <button id="save-btn">💾</button>
-  <button id="retry-btn">🔁</button>
-  <div id="instructions">
-    No iPhone, toque e segure a imagem para salvar.
+  <div id="buttons">
+    <button id="switch-camera" title="Trocar câmera">🔄</button>
+    <button id="capture" title="Tirar foto">📸</button>
   </div>
-</div>
 
-<script>
-  let usingFrontCamera = true;
-  let stream;
+  <canvas id="canvas" style="display:none;"></canvas>
 
-  const video = document.getElementById("video");
-  const overlay = document.getElementById("overlay");
-  const canvas = document.getElementById("canvas");
-  const captureBtn = document.getElementById("capture");
-  const switchCameraBtn = document.getElementById("switch-camera");
-  const previewContainer = document.getElementById("preview-container");
-  const photoPreview = document.getElementById("photo-preview");
-  const saveBtn = document.getElementById("save-btn");
-  const retryBtn = document.getElementById("retry-btn");
-  const instructions = document.getElementById("instructions");
-  const isiOS = /iPhone|iPad|iPod/i.test(navigator.userAgent);
+  <div id="preview-container">
+    <img id="photo-preview" />
+    <button id="save-btn">Salvar na galeria</button>
+    <button id="retry-btn">Tirar outra</button>
 
-  async function startCamera() {
-    if (stream) stream.getTracks().forEach(t => t.stop());
+    <div id="instructions">
+      Se estiver no iPhone:<br>
+      Toque e segure a imagem e selecione “Salvar na Fototeca”.
+    </div>
+  </div>
 
-    stream = await navigator.mediaDevices.getUserMedia({
-      video: {
-        width: { ideal: 1920 },
-        height: { ideal: 1080 },
-        facingMode: usingFrontCamera ? "user" : "environment"
-      }
-    });
+  <script>
+    const video = document.getElementById("video");
+    const overlay = document.getElementById("overlay");
+    const canvas = document.getElementById("canvas");
+    const captureBtn = document.getElementById("capture");
+    const switchCameraBtn = document.getElementById("switch-camera");
+    const photoPreview = document.getElementById("photo-preview");
+    const previewContainer = document.getElementById("preview-container");
+    const saveBtn = document.getElementById("save-btn");
+    const retryBtn = document.getElementById("retry-btn");
+    const instructions = document.getElementById("instructions");
 
-    video.srcObject = stream;
-    video.style.transform = usingFrontCamera ? "scaleX(-1)" : "scaleX(1)";
-  }
+    let usingFrontCamera = true;
+    let stream;
+    const isiOS = /iPhone|iPad|iPod/i.test(navigator.userAgent);
 
-  switchCameraBtn.onclick = () => {
-    usingFrontCamera = !usingFrontCamera;
-    startCamera();
-  };
+    async function startCamera() {
+      if (stream) stream.getTracks().forEach(t => t.stop());
 
-  captureBtn.onclick = () => {
-    const track = stream.getVideoTracks()[0];
-    const settings = track.getSettings();
-    const w = settings.width;
-    const h = settings.height;
+      stream = await navigator.mediaDevices.getUserMedia({
+        video: {
+          facingMode: usingFrontCamera ? "user" : "environment",
+          width: { ideal: 1920 },
+          height: { ideal: 1080 }
+        }
+      });
 
-    canvas.width = w;
-    canvas.height = h;
-    const ctx = canvas.getContext("2d");
-
-    if (usingFrontCamera) {
-      ctx.translate(w, 0);
-      ctx.scale(-1, 1);
+      video.srcObject = stream;
+      video.style.transform = usingFrontCamera ? "scaleX(-1)" : "scaleX(1)";
     }
 
-    ctx.filter = "brightness(1.08) contrast(1.1) saturate(1.15)";
-    ctx.drawImage(video, 0, 0, w, h);
+    switchCameraBtn.onclick = () => {
+      usingFrontCamera = !usingFrontCamera;
+      startCamera();
+    };
 
-    ctx.setTransform(1, 0, 0, 1, 0, 0);
-    ctx.filter = "none";
-    ctx.drawImage(overlay, 0, 0, w, h);
+    captureBtn.onclick = () => {
+      const track = stream.getVideoTracks()[0];
+      const settings = track.getSettings();
 
-    photoPreview.src = canvas.toDataURL("image/png");
-    previewContainer.style.display = "flex";
-  };
+      canvas.width = settings.width;
+      canvas.height = settings.height;
 
-  saveBtn.onclick = () => {
-    const a = document.createElement("a");
-    a.href = photoPreview.src;
-    a.download = "foto.png";
-    a.click();
+      const ctx = canvas.getContext("2d");
 
-    if (isiOS) instructions.style.display = "block";
-  };
+      if (usingFrontCamera) {
+        ctx.translate(canvas.width, 0);
+        ctx.scale(-1, 1);
+      }
 
-  retryBtn.onclick = () => {
-    previewContainer.style.display = "none";
-    instructions.style.display = "none";
-  };
+      ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
 
-  startCamera();
-</script>
+      ctx.setTransform(1, 0, 0, 1, 0, 0);
+      ctx.drawImage(overlay, 0, 0, canvas.width, canvas.height);
 
+      const data = canvas.toDataURL("image/png");
+
+      photoPreview.src = data;
+      previewContainer.style.display = "flex";
+    };
+
+    saveBtn.onclick = () => {
+      const a = document.createElement("a");
+      a.href = photoPreview.src;
+      a.download = "foto-moldura.png";
+      a.click();
+
+      if (isiOS) instructions.style.display = "block";
+    };
+
+    retryBtn.onclick = () => {
+      previewContainer.style.display = "none";
+      instructions.style.display = "none";
+    };
+
+    startCamera();
+  </script>
 </body>
 </html>
